@@ -61,7 +61,7 @@ func saveCSVFileTask(filepath string) error {
 
 	csvwriter := csv.NewWriter(csvfile)
 	// Changing the default field delimiter to tab
-	csvwriter.Comma = '#' // jast change thi
+	csvwriter.Comma = '#' // just change this
 	//for _, row := range myData {
 	//	temp := []string{row.Name, row.Surname, row.Number, row.LastAccess}
 	//	_ = csvwriter.Write(temp)
