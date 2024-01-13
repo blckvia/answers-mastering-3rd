@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/csv"
 	"fmt"
-	"os"
 	"reflect"
 	"sort"
 )
@@ -48,26 +46,6 @@ func mapToSlices(a interface{}) (interface{}, interface{}, error) {
 	}
 
 	return firstSlice, secondSlice, nil
-}
-
-// Task: Change csvData.go to separate record fields based on
-// # symbol.
-func saveCSVFileTask(filepath string) error {
-	csvfile, err := os.Create(filepath)
-	if err != nil {
-		return err
-	}
-	defer csvfile.Close()
-
-	csvwriter := csv.NewWriter(csvfile)
-	// Changing the default field delimiter to tab
-	csvwriter.Comma = '#' // just change this
-	//for _, row := range myData {
-	//	temp := []string{row.Name, row.Surname, row.Number, row.LastAccess}
-	//	_ = csvwriter.Write(temp)
-	//}
-	csvwriter.Flush()
-	return nil
 }
 
 func main() {
