@@ -1,5 +1,9 @@
-// # Task: Change csvData.go to separate record fields based on
-// # symbol.
+// Task: Change csvData.go to separate record fields based on
+// symbol.
+
+// Second Task: Modify csvData.go to be able to split
+// record fields with a symbol, which is specified as a command argument
+// lines.
 package main
 
 import (
@@ -40,7 +44,7 @@ func readCSVFilee(filepath string) ([][]string, error) {
 }
 
 // Change file name for avoid linter errors
-func saveCSVFilee(filepath string) error {
+func saveCSVFilee(filepath string, delimiter rune) error {
 	csvfile, err := os.Create(filepath)
 	if err != nil {
 		return err
@@ -49,7 +53,8 @@ func saveCSVFilee(filepath string) error {
 
 	csvwriter := csv.NewWriter(csvfile)
 	// Changing the default field delimiter to tab
-	csvwriter.Comma = '#' // Just change it
+	//csvwriter.Comma = '#' // Just change it Task: 1
+	csvwriter.Comma = delimiter // Task: 2
 	for _, row := range myData {
 		temp := []string{row.Name, row.Surname, row.Number, row.LastAccess}
 		_ = csvwriter.Write(temp)
@@ -59,13 +64,20 @@ func saveCSVFilee(filepath string) error {
 }
 
 func main() {
-	if len(os.Args) != 3 {
+	if len(os.Args) != 4 {
 		fmt.Println("csvData input output!")
 		return
 	}
 
 	input := os.Args[1]
 	output := os.Args[2]
+	delimiter := []rune(os.Args[3])
+
+	if len(delimiter) != 1 {
+		fmt.Println("Delimiter must be a single character")
+		return
+	}
+
 	lines, err := readCSVFilee(input)
 	if err != nil {
 		fmt.Println(err)
@@ -84,7 +96,7 @@ func main() {
 		fmt.Println(temp)
 	}
 
-	err = saveCSVFilee(output)
+	err = saveCSVFilee(output, delimiter[0])
 	if err != nil {
 		fmt.Println(err)
 		return
