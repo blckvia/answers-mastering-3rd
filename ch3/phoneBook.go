@@ -1,3 +1,15 @@
+// Task: Make the necessary changes to phoneBook.go so that the index is created
+// based on the LastAccess field. Could this be useful? Does it work?
+// Why?
+// Answer:
+// 1. Last access updates everytime when record is searching making it dynamic
+// and unstable for use as index key.
+// 2.The current implementation uses the index to quickly search for a record by phone number.
+// If you're using LastAccess for indexing, this won't make sense since searches aren't
+// typically based on last access time.
+// 3. Because LastAccess is updated with every search, this can lead to indexing
+// conflicts and the need to rebuild the index frequently.
+
 package main
 
 import (
@@ -84,7 +96,7 @@ func deleteEntry(key string) error {
 func createIndex() error {
 	index = make(map[string]int)
 	for i, v := range data {
-		index[v.Tel] = i
+		index[v.LastAccess] = i // just change it
 	}
 
 	return nil
