@@ -19,7 +19,7 @@ type Entry struct {
 }
 
 // CSVFILE resides in the home directory of the current user
-var CSVFILE = "/Users/mtsouk/csv.data"
+var CSVFILE = "ch3/phoneBook.csv"
 
 type PhoneBook []Entry
 
