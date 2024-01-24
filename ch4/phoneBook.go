@@ -1,7 +1,12 @@
+// Integrate functionality of sortCSV.go
+// Add support for the 'reverse' command in phonebook.go to display its entries in reverse order.
+// Use an empty interface and a function that allows distinguishing between two different created structures.
+
 package main
 
 import (
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -18,12 +23,22 @@ type Entry struct {
 	LastAccess string
 }
 
+type Entry2 struct {
+	Name       string
+	Surname    string
+	Age        int
+	Tel        string
+	LastAccess string
+}
+
 // CSVFILE resides in the home directory of the current user
 var CSVFILE = "ch3/phoneBook.csv"
 
 type PhoneBook []Entry
+type PhoneBook2 []Entry2
 
 var data = PhoneBook{}
+var data2 = PhoneBook2{}
 var index map[string]int
 
 func readCSVFile(filepath string) error {
@@ -44,15 +59,44 @@ func readCSVFile(filepath string) error {
 		return err
 	}
 
+	var firstLine = true
+	var format1 = true
 	for _, line := range lines {
-		temp := Entry{
-			Name:       line[0],
-			Surname:    line[1],
-			Tel:        line[2],
-			LastAccess: line[3],
+		if firstLine {
+			if len(line) == 4 {
+				format1 = true
+			} else if len(line) == 5 {
+				format1 = false
+			} else {
+				return errors.New("Unknown File Format!")
+			}
+			firstLine = false
 		}
-		// Storing to global variable
-		data = append(data, temp)
+
+		if format1 {
+			if len(line) == 4 {
+				temp := Entry{
+					Name:       line[0],
+					Surname:    line[1],
+					Tel:        line[2],
+					LastAccess: line[3],
+				}
+				// Storing to global variable
+				data = append(data, temp)
+			}
+		} else {
+			if len(line) == 5 {
+				age, _ := strconv.Atoi(line[2])
+				temp := Entry2{
+					Name:       line[0],
+					Surname:    line[1],
+					Age:        age,
+					Tel:        line[3],
+					LastAccess: line[4],
+				}
+				data2 = append(data2, temp)
+			}
+		}
 	}
 
 	return nil
@@ -137,10 +181,41 @@ func search(key string) *Entry {
 	return &data[i]
 }
 
-func list() {
-	sort.Sort(PhoneBook(data))
-	for _, v := range data {
-		fmt.Println(v)
+func list(data interface{}) {
+	switch T := data.(type) {
+	case PhoneBook:
+		d := data.(PhoneBook)
+		sort.Sort(PhoneBook(d))
+		for _, v := range d {
+			fmt.Println(v)
+		}
+	case PhoneBook2:
+		d := data.(PhoneBook2)
+		sort.Sort(PhoneBook2(d))
+		for _, v := range d {
+			fmt.Println(v)
+		}
+	default:
+		fmt.Println("Not supported type!\n", T)
+	}
+}
+
+func reverseList(data interface{}) {
+	switch T := data.(type) {
+	case PhoneBook:
+		d := data.(PhoneBook)
+		sort.Sort(sort.Reverse(PhoneBook(d)))
+		for _, v := range d {
+			fmt.Println(v)
+		}
+	case PhoneBook2:
+		d := data.(PhoneBook2)
+		sort.Sort(sort.Reverse(PhoneBook2(d)))
+		for _, v := range d {
+			fmt.Println(v)
+		}
+	default:
+		fmt.Println("Not supported type!\n", T)
 	}
 }
 
@@ -190,6 +265,21 @@ func (a PhoneBook) Less(i, j int) bool {
 }
 
 func (a PhoneBook) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
+}
+
+func (a PhoneBook2) Len() int {
+	return len(a)
+}
+
+func (a PhoneBook2) Less(i, j int) bool {
+	if a[i].Surname == a[j].Surname {
+		return a[i].Name < a[j].Name
+	}
+	return a[i].Surname < a[j].Surname
+}
+
+func (a PhoneBook2) Swap(i, j int) {
 	a[i], a[j] = a[j], a[i]
 }
 
@@ -270,7 +360,9 @@ func main() {
 		}
 		fmt.Println(*temp)
 	case "list":
-		list()
+		list(data)
+	case "reverse-list":
+		reverseList(data)
 	default:
 		fmt.Println("Not a valid option")
 	}
